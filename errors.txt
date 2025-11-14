@@ -1,46 +1,20 @@
-(base) PS C:\Users\mohdk\Desktop\assignments\UsS\ecs-visualizer> npm run dev
+## Error Type
+Runtime ReferenceError
 
-> dashboard@0.1.0 dev
-> next dev --webpack 
+## Error Message
+SidebarSeparator is not defined
 
-   ▲ Next.js 16.0.0 (webpack)
-   - Local:        http://localhost:3000   
-   - Network:      http://172.24.224.1:3000
 
- ✓ Starting...
- ✓ Ready in 2s
- ○ Compiling / ...
- ⨯ ./src/app/page.tsx:6:1
-Module not found: Can't resolve '@/components/TodoList'       
-  4 | import AppRadialChart from "@/components/AppRadialChart"
-  5 | import CardList from "@/components/CardList"
-> 6 | import TodoList from "@/components/TodoList"
-    | ^
-  7 |
-  8 | const HomePage = () => {
-  9 |   return (
+    at AppSidebar (src\components\AppSidebar.tsx:46:6)
+    at RootLayout (src\app\layout.tsx:38:11)
 
-https://nextjs.org/docs/messages/module-not-found
- ⨯ ./src/app/page.tsx:6:1
-Module not found: Can't resolve '@/components/TodoList'       
-  4 | import AppRadialChart from "@/components/AppRadialChart"
-  5 | import CardList from "@/components/CardList"
-> 6 | import TodoList from "@/components/TodoList"
-    | ^
-  7 |
-  8 | const HomePage = () => {
-  9 |   return (
+## Code Frame
+  44 |         </SidebarMenu>
+  45 |       </SidebarHeader>
+> 46 |     <SidebarSeparator className="mx-0"/>
+     |      ^
+  47 |       <SidebarContent>
+  48 |         <SidebarGroup>
+  49 |             <SidebarGroupLabel>Visualizations</SidebarGroupLabel>
 
-https://nextjs.org/docs/messages/module-not-found
- ⨯ ./src/app/page.tsx:6:1
-Module not found: Can't resolve '@/components/TodoList'       
-  4 | import AppRadialChart from "@/components/AppRadialChart"
-  5 | import CardList from "@/components/CardList"
-> 6 | import TodoList from "@/components/TodoList"
-    | ^
-  7 |
-  8 | const HomePage = () => {
-  9 |   return (
-
-https://nextjs.org/docs/messages/module-not-found
- GET / 500 in 28.9s (compile: 28.7s, render: 161ms)
+Next.js version: 16.0.0 (Webpack)
