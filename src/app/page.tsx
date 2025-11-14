@@ -3,7 +3,6 @@ import AppBarChart from "@/components/AppBarChart"
 import AppPieChart from "@/components/AppPieChart"
 import AppRadialChart from "@/components/AppRadialChart"
 import CardList from "@/components/CardList"
-import TodoList from "@/components/TodoList"
 
 const HomePage = () => {
   return (
@@ -22,10 +21,6 @@ const HomePage = () => {
         <AppAreaChart />
       </div>
       
-      <div className="bg-primary-foreground p-4 rounded-lg ">
-        <TodoList />
-      </div>
-
       <div className="bg-primary-foreground p-4 rounded-lg ">
         <CardList title={"Popular Content"} />
       </div>

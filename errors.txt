@@ -1,54 +1,46 @@
-## Error Type
-Console Error
+(base) PS C:\Users\mohdk\Desktop\assignments\UsS\ecs-visualizer> npm run dev
 
-## Error Message
-A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+> dashboard@0.1.0 dev
+> next dev --webpack 
 
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
+   ▲ Next.js 16.0.0 (webpack)
+   - Local:        http://localhost:3000   
+   - Network:      http://172.24.224.1:3000
 
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+ ✓ Starting...
+ ✓ Ready in 2s
+ ○ Compiling / ...
+ ⨯ ./src/app/page.tsx:6:1
+Module not found: Can't resolve '@/components/TodoList'       
+  4 | import AppRadialChart from "@/components/AppRadialChart"
+  5 | import CardList from "@/components/CardList"
+> 6 | import TodoList from "@/components/TodoList"
+    | ^
+  7 |
+  8 | const HomePage = () => {
+  9 |   return (
 
-https://react.dev/link/hydration-mismatch
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./src/app/page.tsx:6:1
+Module not found: Can't resolve '@/components/TodoList'       
+  4 | import AppRadialChart from "@/components/AppRadialChart"
+  5 | import CardList from "@/components/CardList"
+> 6 | import TodoList from "@/components/TodoList"
+    | ^
+  7 |
+  8 | const HomePage = () => {
+  9 |   return (
 
-  ...
-    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
-      <AppDevOverlayErrorBoundary globalError={[...]}>
-        <ReplaySsrOnlyErrors>
-        <DevRootHTTPAccessFallbackBoundary>
-          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
-            <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
-              <RedirectBoundary>
-                <RedirectErrorBoundary router={{...}}>
-                  <Head>
-                  <__next_root_layout_boundary__>
-                    <SegmentViewNode type="layout" pagePath="layout.tsx">
-                      <SegmentTrieNode>
-                      <link>
-                      <RootLayout>
-                        <html lang="en" suppressHydrationWarning={true}>
-                          <body
-                            className="__variable_188709 __variable_9a8899 antialiased flex"
--                           data-new-gr-c-s-check-loaded="14.1123.0"
--                           data-gr-ext-installed=""
-                          >
-                  ...
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./src/app/page.tsx:6:1
+Module not found: Can't resolve '@/components/TodoList'       
+  4 | import AppRadialChart from "@/components/AppRadialChart"
+  5 | import CardList from "@/components/CardList"
+> 6 | import TodoList from "@/components/TodoList"
+    | ^
+  7 |
+  8 | const HomePage = () => {
+  9 |   return (
 
-
-
-    at body (<anonymous>:null:null)
-    at RootLayout (src\app\layout.tsx:31:7)
-
-## Code Frame
-  29 |   return (
-  30 |     <html lang="en" suppressHydrationWarning>
-> 31 |       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}>
-     |       ^
-  32 |         <ThemeProvider
-  33 |           attribute="class"
-  34 |           defaultTheme="system"
-
-Next.js version: 16.0.0 (Webpack)
+https://nextjs.org/docs/messages/module-not-found
+ GET / 500 in 28.9s (compile: 28.7s, render: 161ms)
