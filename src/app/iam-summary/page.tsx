@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 
@@ -94,7 +95,7 @@ const TimelinePage = () => {
 
       {/* Timeline Slider Section */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="">
           <div className="flex items-center space-x-4">
             <span className="font-semibold">TIMELINE</span>
             <Slider
@@ -103,7 +104,7 @@ const TimelinePage = () => {
               step={1}
               onValueChange={(value) => setSliderValue(value[0])}
             />
-            <span className="text-sm text-gray-600 w-28 text-right">
+            <span className="text-sm text-gray-600 w-28 text-center tabular-nums">
               {sliderValue} days back
             </span>
           </div>

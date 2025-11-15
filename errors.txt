@@ -1,20 +1,104 @@
-## Error Type
-Runtime ReferenceError
+The screen is divided into two major sections:
 
-## Error Message
-SidebarSeparator is not defined
+Main data-flow visualizer (left side)
 
+Filter sidebar (right side)
 
-    at AppSidebar (src\components\AppSidebar.tsx:46:6)
-    at RootLayout (src\app\layout.tsx:38:11)
+🖥️ Top Section
+Header
 
-## Code Frame
-  44 |         </SidebarMenu>
-  45 |       </SidebarHeader>
-> 46 |     <SidebarSeparator className="mx-0"/>
-     |      ^
-  47 |       <SidebarContent>
-  48 |         <SidebarGroup>
-  49 |             <SidebarGroupLabel>Visualizations</SidebarGroupLabel>
+Title: DATA FLOW
 
-Next.js version: 16.0.0 (Webpack)
+Subtitle: CLUSTER – SERVICE OVERVIEW → [input box]
+
+On the right:
+
+“Welcome, Kirmada”
+
+Hamburger menu icon
+
+Three Info Cards
+
+Placed horizontally:
+
+RISK RATE → +4.8
+
+RESOURCE WEIGHT → 3
+
+PERMISSION AVAILED → 5
+
+These look like summary metrics for the selected task.
+
+🔄 Main Data Flow Diagram
+
+Inside a bordered box:
+
+Central Node
+
+A big block labeled TASK-01
+
+Connected Nodes
+
+Several nodes labelled D0, D1, D2, D3, D4 connected to TASK-01 via arrows.
+
+Each arrow has a permission name written on it:
+
+PERMISSION O
+
+PERMISSION Y
+
+PERMISSION Z
+
+PERMISSION X
+
+PERMISSION V
+…something like an access graph.
+
+Resources
+
+Three resource boxes:
+
+RESOURCE 1
+
+RESOURCE 2
+
+RESOURCE 3
+
+Each resource also has arrows coming in from D-nodes, also annotated with permissions (like PERMISSION M, N, Y, P, K).
+
+Basically this is a graph showing which task uses which dependency (D0–D4), through which permission, and which resources they eventually touch.
+
+🎛️ Filter Sidebar (Right Side)
+Header
+
+Funnel icon labeled Filter
+
+Close (X) icon
+
+Resource Filter
+
+Task Selection with checkboxes:
+
+Task-01 (checked)
+
+Task-02
+
+Task-03
+
+Permission Filter
+
+Checkbox: Show only unused permissions
+
+Checkbox: Show only high-risk permissions
+
+Data Flow Filters
+
+Risk Level Filter with three options:
+
+High (2) – red dot
+
+Medium (1) – yellow dot
+
+Low (0) – blue dot
+
+High is selected.

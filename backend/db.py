@@ -71,17 +71,18 @@ class Database:
         with self.driver.session() as session:
             result = session.run("MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n, r, m")
             
-            nodes = set()
+            nodes = {}
             edges = []
 
             for record in result:
                 if record["n"]:
-                    nodes.add(self._format_node(record["n"]))
+                    formatted_node_n = self._format_node(record["n"])
+                    nodes[formatted_node_n["id"]] = formatted_node_n
                 if record["m"]:
-                    nodes.add(self._format_node(record["m"]))
+                    formatted_node_m = self._format_node(record["m"])
+                    nodes[formatted_node_m["id"]] = formatted_node_m
                 if record["r"]:
                     edge = self._format_edge(record["r"])
-                    if edge not in edges:
-                        edges.append(edge)
+                    edges.append(edge)
 
-            return {"nodes": list(nodes), "edges": edges}
+            return {"nodes": list(nodes.values()), "edges": edges}

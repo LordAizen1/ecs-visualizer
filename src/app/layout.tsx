@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import AppSidebar from "@/components/AppSidebar";
-import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { cookies } from "next/headers";
+import AppLayout from "./AppLayout";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -28,24 +26,14 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${spaceGrotesk.variable} antialiased flex py-2`}>
+      <body className={`${spaceGrotesk.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
           >
-          <SidebarProvider defaultOpen={defaultOpen}> 
-          <AppSidebar />
-          <main className="w-full">
-            <Navbar />
-            <div>
-              <div className="px-4">
-                {children}
-              </div>
-            </div>
-          </main>
-          </SidebarProvider>
+            <AppLayout defaultOpen={defaultOpen}>{children}</AppLayout>
         </ThemeProvider>
       </body>
     </html>

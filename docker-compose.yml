@@ -13,6 +13,7 @@ services:
       - NEO4J_PASSWORD=password
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - FRONTEND_URL=http://localhost:3000
     depends_on:
       - neo4j
       - redis

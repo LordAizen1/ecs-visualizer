@@ -13,6 +13,9 @@ import ReactFlow, {
 import "reactflow/dist/style.css"
 
 import { getRoot } from "@/lib/api" // Your API function
+import CustomNode from "./CustomNode"
+
+const nodeTypes = { custom: CustomNode };
 
 // --- MOCK DATA ---
 // This is the format React Flow needs.
@@ -50,9 +53,37 @@ const initialEdges: Edge[] = [
 ]
 // --- END MOCK DATA ---
 
+import ELK from 'elkjs/lib/elk.bundled.js';
+
+const elk = new ELK();
+
+const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
+  const graph = {
+    id: 'root',
+    layoutOptions: { 'elk.algorithm': 'layered', 'elk.direction': 'RIGHT' },
+    children: nodes.map((node) => ({
+      ...node,
+      width: 80,
+      height: 80,
+    })),
+    edges: edges,
+  };
+
+  return elk
+    .layout(graph)
+    .then((layoutedGraph) => ({
+      nodes: layoutedGraph.children.map((node) => ({
+        ...node,
+        position: { x: node.x, y: node.y },
+      })),
+      edges: layoutedGraph.edges,
+    }))
+    .catch(console.error);
+};
+
 // This is the legend you see in the image
 const Legend = () => (
-  <div className="absolute bottom-4 left-4 p-3 bg-white dark:bg-gray-800 border rounded-lg shadow-lg z-10">
+  <div className="absolute top-4 right-4 p-3 bg-white dark:bg-gray-900 border rounded-lg shadow-lg z-10">
     <h4 className="text-sm font-semibold mb-2">Legend</h4>
     <div className="flex items-center mb-1">
       <div
@@ -95,47 +126,7 @@ const ClusterVisualization = ({
   const [loading, setLoading] = useState<any>(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    // Fetch data from your backend
-    const fetchData = async () => {
-      try {
-        const result = await getRoot()
-        setApiData(result)
 
-        //
-        // --- !!! YOUR NEXT STEP IS HERE !!! ---
-        //
-        // You must write a function to convert the 'result'
-        // from your API into the 'nodes' and 'edges' format
-        
-        // PSEUDO-CODE - Your logic will be different
-        //
-        // FIX: Added (task: any) to solve the TypeScript error
-        const newNodes = result.tasks.map((task: any) => ({
-          id: task.id,
-          position: { x: Math.random() * 400, y: Math.random() * 400 },
-          data: { label: task.name } // <--- This will show YOUR task names
-        }));
-        
-        // FIX: Added (conn: any) to solve the TypeScript error
-        const newEdges = result.connections.map((conn: any) => ({
-          id: `${conn.from}-${conn.to}`,
-          source: conn.from,
-          target: conn.to
-        }));
-
-        setNodes(newNodes);
-        setEdges(newEdges);
-        //
-      } catch (err) {
-        setError("Failed to connect to the backend.")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, []) // Runs once on mount
 
 
 
@@ -158,29 +149,43 @@ const ClusterVisualization = ({
 
   // --- HOOK 2: Transform and Filter (runs when data or filters change) ---
   useEffect(() => {
-    if (apiData && apiData.nodes) { // <-- Check for apiData.nodes
-      
-      // 1. Transform API data into nodes and edges
-      let transformedNodes = apiData.nodes.map((node: any) => ({
-        id: node.id, // Use the ID from the backend
-        position: { x: Math.random() * 400, y: Math.random() * 400 },
-        data: {
-          // Use properties.name or properties.id as the label
-          label: node.properties.name || node.properties.id || node.id,
-          // You can pass all properties for filtering
-          isRisky: node.properties.isRisky || false, 
-          isExternal: node.properties.isExternal || false
-        } 
-      }));
-      
+    if (apiData && apiData.nodes) {
+      console.log("API Data:", JSON.stringify(apiData, null, 2)); // <-- Add this line
+      let transformedNodes = apiData.nodes.map((node: any) => {
+        const nodeType = node.label;
+        let color = '#ccc';
+        if (nodeType === 'Task') {
+          color = '#86efac';
+        } else if (nodeType === 'Cluster') {
+          color = '#93c5fd';
+        } else if (nodeType === 'External Endpoint') {
+          color = '#a855f7';
+        }
+
+        return {
+          id: node.id,
+          type: 'custom', // Set node type to custom
+          position: { x: 0, y: 0 }, // Initial position, will be overwritten by ELK
+          data: {
+            label: node.properties.name || node.properties.id || node.id,
+            isRisky: node.properties.isRisky || false,
+            isExternal: node.properties.isExternal || false,
+            backgroundColor: color, // Pass color to custom node
+          },
+        };
+      });
+
       let transformedEdges = apiData.edges.map((edge: any) => ({
-        id: edge.id,     // Use the edge ID from the backend
-        source: edge.source, // Use the source from the backend
-        target: edge.target, // Use the target from the backend
-        isRisky: edge.properties.isRisky || false // Use properties
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        isRisky: edge.properties.isRisky || false,
+        style: edge.properties.isRisky ? { stroke: '#34D399', strokeWidth: 3 } : undefined,
+        animated: edge.properties.isRisky,
       }));
 
-      // 2. Apply filters (this logic is still an example)
+      console.log("Transformed Data:", JSON.stringify({ transformedNodes, transformedEdges }, null, 2)); // <-- Add this line
+
       if (showOnlyRisky) {
         transformedEdges = transformedEdges.filter((edge: any) => edge.isRisky);
         const riskyNodeIds = new Set();
@@ -194,14 +199,16 @@ const ClusterVisualization = ({
       if (showOnlyExternal) {
         transformedNodes = transformedNodes.filter((node: any) => node.data.isExternal);
         const externalNodeIds = new Set(transformedNodes.map((node: any) => node.id));
-        transformedEdges = transformedEdges.filter((edge: any) => 
-          externalNodeIds.has(edge.source) && externalNodeIds.has(edge.target)
+        transformedEdges = transformedEdges.filter(
+          (edge: any) => externalNodeIds.has(edge.source) && externalNodeIds.has(edge.target)
         );
       }
 
-      // 3. Set the final nodes and edges
-      setNodes(transformedNodes);
-      setEdges(transformedEdges);
+      getLayoutedElements(transformedNodes, transformedEdges).then(({ nodes, edges }) => {
+        console.log("Layouted Data:", JSON.stringify({ nodes, edges }, null, 2)); // <-- Add this line
+        setNodes(nodes);
+        setEdges(edges);
+      });
     }
   }, [apiData, showOnlyRisky, showOnlyExternal, setNodes, setEdges]);
 
@@ -219,6 +226,7 @@ const ClusterVisualization = ({
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
+      nodeTypes={nodeTypes}
       fitView
     >
       <Background />

@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import {
-  MagnifyingGlassIcon,
-  EyeOpenIcon,
-  EyeNoneIcon,
-  MixerHorizontalIcon,
-} from "@radix-ui/react-icons"
+  Search,
+  Eye,
+  EyeOff,
+  SlidersHorizontal,
+} from "lucide-react"
 
 // Shadcn UI components
 import { Input } from "@/components/ui/input"
@@ -31,11 +31,11 @@ const ClusterMapPage = () => {
   const [showOnlyExternal, setShowOnlyExternal] = useState(false)
 
   return (
-    <div className="flex flex-col h-screen w-full bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col h-screen w-full ">
       {/* Top Search Header */}
-      <header className="flex items-center h-16 px-6 border-b bg-white dark:bg-gray-800">
+      <header className="flex items-center h-16 px-6 border-b ">
         <div className="relative w-full max-w-md">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
           <Input
             type="search"
             placeholder="Search tasks, services, endpoints...."
@@ -59,12 +59,12 @@ const ClusterMapPage = () => {
         </div>
 
         {/* Right Sidebar */}
-        <aside className="w-80 h-full bg-white dark:bg-gray-800 border-l p-4 overflow-y-auto">
+        <aside className="w-80 h-full border-l p-4 overflow-y-auto">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-lg">Filter</CardTitle>
               <Button variant="ghost" size="icon">
-                <MixerHorizontalIcon className="h-5 w-5" />
+                <SlidersHorizontal className="h-5 w-5" />
               </Button>
             </CardHeader>
             <CardContent>

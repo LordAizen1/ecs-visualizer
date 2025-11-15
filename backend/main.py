@@ -6,10 +6,7 @@ from db import Database, get_db, close_db  # <-- This line is fixed
 app = FastAPI()
 
 # --- CORS Middleware ---
-origins = [
-    "http://localhost:3000",
-    os.environ.get("FRONTEND_URL", "http://localhost:3000")
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
