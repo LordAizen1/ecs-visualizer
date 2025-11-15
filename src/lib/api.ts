@@ -1,18 +1,18 @@
-import axios from 'axios';
+import axios from "axios";
 
+// 1. Create the apiClient with the correct backend URL
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000', // The address of the FastAPI backend
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: "http://localhost:8000", // <-- This tells the frontend where the backend is
 });
 
+// 2. Your getRoot function now uses the configured client
 export const getRoot = async () => {
   try {
-    const response = await apiClient.get('/');
+    // This will now call "http://localhost:8000/api/v1/graph"
+    const response = await apiClient.get("/api/v1/graph");
     return response.data;
   } catch (error) {
-    console.error('Error fetching root endpoint:', error);
+    console.error("Error fetching root endpoint:", error);
     throw error;
   }
 };
