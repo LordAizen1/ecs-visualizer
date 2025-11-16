@@ -14,12 +14,10 @@ import "reactflow/dist/style.css"
 
 import { getRoot } from "@/lib/api" // Your API function
 import CustomNode from "./CustomNode"
+import NodeDetailsSheet from "./NodeDetailsSheet"
 
 const nodeTypes = { custom: CustomNode };
 
-// --- MOCK DATA ---
-// This is the format React Flow needs.
-// Your API data must be transformed into this structure.
 const initialNodes: Node[] = [
   {
     id: "1",
@@ -51,7 +49,6 @@ const initialEdges: Edge[] = [
   { id: "e1-4", source: "1", target: "4" },
   { id: "e2-3", source: "2", target: "3" },
 ]
-// --- END MOCK DATA ---
 
 import ELK from 'elkjs/lib/elk.bundled.js';
 
@@ -81,9 +78,8 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
     .catch(console.error);
 };
 
-// This is the legend you see in the image
 const Legend = () => (
-  <div className="absolute top-4 right-4 p-3 bg-white dark:bg-gray-900 border rounded-lg shadow-lg z-10">
+  <div className="absolute top-4 right-4 p-3 bg-white dark:bg-black border rounded-lg shadow-lg z-10">
     <h4 className="text-sm font-semibold mb-2">Legend</h4>
     <div className="flex items-center mb-1">
       <div
@@ -109,6 +105,37 @@ const Legend = () => (
   </div>
 )
 
+const clusterProdData = {
+  name: "Cluster-Prod",
+  region: "us-east-1",
+  overview: {
+    totalTasks: "8 Running, 1 Pending",
+    services: "2",
+    cpuUtilization: "65%",
+    memoryUtilization: "48%",
+    activeConnections: "24",
+  },
+  services: [
+    {
+      name: "web-service",
+      runningTasks: "2 tasks",
+      launchType: "Fargate",
+      tasks: ["task-01", "task-02"],
+    },
+    {
+      name: "api-gateway-service",
+      runningTasks: "1 task",
+      launchType: "EC2",
+      tasks: ["task-03"],
+    },
+  ],
+  risks: {
+    unusedPermissions: 3,
+    riskyNetworkFlows: 2,
+    compliantTasks: 2,
+  },
+};
+
 interface ClusterVisualizationProps {
   showOnlyRisky: boolean
   showOnlyExternal: boolean
@@ -120,22 +147,25 @@ const ClusterVisualization = ({
 }: ClusterVisualizationProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const [selectedNode, setSelectedNode] = useState<any>(null)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
 
-  // State for your API data
   const [apiData, setApiData] = useState<any>(null)
   const [loading, setLoading] = useState<any>(true)
   const [error, setError] = useState<string | null>(null)
 
+  const onNodeClick = (event: React.MouseEvent, node: Node) => {
+    if (node.data.label === "Cluster-Prod") {
+      setSelectedNode(clusterProdData);
+      setIsSheetOpen(true);
+    }
+  }
 
-
-
-
-  // --- HOOK 1: Fetch data (runs only once) ---
   useEffect(() => {
     const fetchData = async () => {
       try {
         const result = await getRoot();
-        setApiData(result); // 1. Just save the raw data
+        setApiData(result);
       } catch (err) {
         setError("Failed to connect to the backend.");
       } finally {
@@ -144,13 +174,10 @@ const ClusterVisualization = ({
     };
 
     fetchData();
-  }, []); // Empty array means "run only once"
+  }, []);
 
-
-  // --- HOOK 2: Transform and Filter (runs when data or filters change) ---
   useEffect(() => {
     if (apiData && apiData.nodes) {
-      console.log("API Data:", JSON.stringify(apiData, null, 2)); // <-- Add this line
       let transformedNodes = apiData.nodes.map((node: any) => {
         const nodeType = node.label;
         let color = '#ccc';
@@ -164,13 +191,13 @@ const ClusterVisualization = ({
 
         return {
           id: node.id,
-          type: 'custom', // Set node type to custom
-          position: { x: 0, y: 0 }, // Initial position, will be overwritten by ELK
+          type: 'custom',
+          position: { x: 0, y: 0 },
           data: {
             label: node.properties.name || node.properties.id || node.id,
             isRisky: node.properties.isRisky || false,
             isExternal: node.properties.isExternal || false,
-            backgroundColor: color, // Pass color to custom node
+            backgroundColor: color,
           },
         };
       });
@@ -183,8 +210,6 @@ const ClusterVisualization = ({
         style: edge.properties.isRisky ? { stroke: '#34D399', strokeWidth: 3 } : undefined,
         animated: edge.properties.isRisky,
       }));
-
-      console.log("Transformed Data:", JSON.stringify({ transformedNodes, transformedEdges }, null, 2)); // <-- Add this line
 
       if (showOnlyRisky) {
         transformedEdges = transformedEdges.filter((edge: any) => edge.isRisky);
@@ -205,7 +230,6 @@ const ClusterVisualization = ({
       }
 
       getLayoutedElements(transformedNodes, transformedEdges).then(({ nodes, edges }) => {
-        console.log("Layouted Data:", JSON.stringify({ nodes, edges }, null, 2)); // <-- Add this line
         setNodes(nodes);
         setEdges(edges);
       });
@@ -221,19 +245,27 @@ const ClusterVisualization = ({
   }
 
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      nodeTypes={nodeTypes}
-      fitView
-    >
-      <Background />
-      <Controls />
-      <MiniMap />
-      <Legend />
-    </ReactFlow>
+    <div className="h-full w-full">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onNodeClick={onNodeClick}
+        nodeTypes={nodeTypes}
+        fitView
+      >
+        <Background />
+        <Controls />
+        <MiniMap />
+        <Legend />
+      </ReactFlow>
+      <NodeDetailsSheet
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        nodeData={selectedNode}
+      />
+    </div>
   )
 }
 

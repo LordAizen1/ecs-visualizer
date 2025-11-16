@@ -1,7 +1,6 @@
 'use client'
 
-import { Link, LogOut, Moon, Settings, Sun, User } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { Moon, Sun } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,31 +50,6 @@ const Navbar = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setTheme("system")}>
                       System
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-            {/* USER MENU */}
-            <DropdownMenu>
-                <DropdownMenuTrigger>
-                    <Avatar>
-                        <AvatarImage src="https://external-preview.redd.it/do9oWqbLGuUMpGTYUE8ERg9GFfcjHC3GabncNyMicDc.jpg?auto=webp&s=76f3f219ada94e634eff9c537c6ddceb34190b0b" />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>                    
-                </DropdownMenuTrigger>
-                <DropdownMenuContent sideOffset={10}>
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                        <User className="h-[1.2rem] w-[1.2rem] mr-2" />
-                        Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Settings  className="h-[1.2rem] w-[1.2rem] mr-2"/>
-                        Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuItem variant="destructive">
-                        <LogOut  className="h-[1.2rem] w-[1.2rem] mr-2"/>
-                        Logout
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

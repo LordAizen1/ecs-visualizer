@@ -44,7 +44,6 @@ const ClusterMapPage = () => {
         </div>
         <div className="ml-auto">
           <span className="text-sm">Welcome, Kirmada</span>
-          {/* You can add a user menu here */}
         </div>
       </header>
 
@@ -71,7 +70,7 @@ const ClusterMapPage = () => {
               {/* Cluster Selector */}
               <div className="mb-4">
                 <h3 className="text-sm font-semibold mb-2">Cluster selector</h3>
-                <div className="p-3 rounded-md border bg-gray-50 dark:bg-gray-700">
+                <div className="p-3 rounded-md border bg-gray-50 dark:bg-black">
                   <p className="font-medium">Cluster-Prod (Selected)</p>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
                     CPU: 65%

@@ -15,7 +15,7 @@ const HomePage = () => {
   const handleConnect = () => {
     // Basic check if keys are entered. No real validation for development.
     if (accessKey && secretKey) {
-      router.push("/cluster-map")
+      router.push("/home")
     } else {
       alert("Please enter both Access Key and Secret Key.")
     }

@@ -1,104 +1,91 @@
-The screen is divided into two major sections:
+📌 Top Section — Cluster Identity
+Cluster-Prod
 
-Main data-flow visualizer (left side)
+Displayed boldly as the title.
 
-Filter sidebar (right side)
+Region: us-east-1
+This indicates where the cluster is deployed (AWS region).
 
-🖥️ Top Section
-Header
+A small X icon sits in the top-right corner — this is clearly a close button for the panel.
 
-Title: DATA FLOW
+📊 Overview Stats Section
 
-Subtitle: CLUSTER – SERVICE OVERVIEW → [input box]
+Labeled “Overview Stats:”
+Each line has a tiny horizontal bar icon (representing metrics):
 
-On the right:
+Total Tasks: 8 Running, 1 Pending
 
-“Welcome, Kirmada”
+Services: 2
 
-Hamburger menu icon
+CPU Utilization: 65%
 
-Three Info Cards
+Memory Utilization: 48%
 
-Placed horizontally:
+Active Connections: 24
 
-RISK RATE → +4.8
+This is a quick at-a-glance health summary of the entire cluster.
 
-RESOURCE WEIGHT → 3
+🧩 Services in the Cluster
 
-PERMISSION AVAILED → 5
+This segment lists all services running inside the cluster, grouped with details.
 
-These look like summary metrics for the selected task.
+Each service begins with a colored dot icon (yellow circle), likely indicating moderate or warning-level status.
 
-🔄 Main Data Flow Diagram
+1. web-service
 
-Inside a bordered box:
+Details shown:
 
-Central Node
+Running: 2 tasks
 
-A big block labeled TASK-01
+Launch Type: Fargate
 
-Connected Nodes
+Tasks: task-01, task-02
 
-Several nodes labelled D0, D1, D2, D3, D4 connected to TASK-01 via arrows.
+(The “Running: 2 tasks” is repeated once — probably placeholder duplication in the mockup.)
 
-Each arrow has a permission name written on it:
+This is a serverless container workload (Fargate).
 
-PERMISSION O
+2. api-gateway-service
 
-PERMISSION Y
+Desired: 1 task
 
-PERMISSION Z
+Running: 1 task
 
-PERMISSION X
+Launch Type: EC2
 
-PERMISSION V
-…something like an access graph.
+Tasks: task-03
 
-Resources
+This suggests:
 
-Three resource boxes:
+It's stable (desired = running).
 
-RESOURCE 1
+It runs on an EC2 instance, not Fargate.
 
-RESOURCE 2
+⚠️ Security & Risks Summary
 
-RESOURCE 3
+This section appears at the bottom with small triangular warning icons.
 
-Each resource also has arrows coming in from D-nodes, also annotated with permissions (like PERMISSION M, N, Y, P, K).
+⚠️ 3 tasks with unused permissions
 
-Basically this is a graph showing which task uses which dependency (D0–D4), through which permission, and which resources they eventually touch.
+Indicates IAM over-privilege.
 
-🎛️ Filter Sidebar (Right Side)
-Header
+⚠️ 2 tasks with risky network flows
 
-Funnel icon labeled Filter
+Maybe hitting external unencrypted endpoints, etc.
 
-Close (X) icon
+✔️ 2 tasks with risky network flows
 
-Resource Filter
+This last line uses a green checkmark instead of a warning triangle, which likely means:
 
-Task Selection with checkboxes:
+These 2 tasks had risk but are now compliant
+or
 
-Task-01 (checked)
+It’s indicating tasks with verified risky flows (depending on the UI logic)
 
-Task-02
+Symbolically:
 
-Task-03
+Yellow ⚠️ = warns
 
-Permission Filter
+Green ✔️ = confirm/detected/verified state
 
-Checkbox: Show only unused permissions
-
-Checkbox: Show only high-risk permissions
-
-Data Flow Filters
-
-Risk Level Filter with three options:
-
-High (2) – red dot
-
-Medium (1) – yellow dot
-
-Low (0) – blue dot
-
-High is selected.
+More context would clarify the intended semantics.

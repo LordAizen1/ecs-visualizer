@@ -45,3 +45,6 @@ backend/__pycache__/
 
 # database
 neo4j_data/
+
+# temporary files
+errors.txt

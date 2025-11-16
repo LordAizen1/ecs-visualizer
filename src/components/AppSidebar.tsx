@@ -1,14 +1,12 @@
-import {Home, Network, ShieldCheck, GitCompareArrows, Settings, User, ChevronDown, LogOut} from "lucide-react"
+import {Home, Network, ShieldCheck, GitCompareArrows, LogOut} from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator } from "./ui/sidebar"
 import Link from "next/link"
 import Image from "next/image"
-import { DropdownMenu, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-
 
 const items = [
     {
         title: "Home",
-        url: "/",
+        url: "/home",
         icon: Home,
     },
     {
@@ -65,29 +63,14 @@ function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton>
-                        <User /> John Doe <ChevronDown className="ml-auto transition-transform group-data-[state=open]/onClick:rotate-180"/>
-                    </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent sideOffset={10} align="end">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                        <User className="h-[1.2rem] w-[1.2rem] mr-2" />
-                        Account
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Settings className="h-[1.2rem] w-[1.2rem] mr-2" />
-                        Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuItem variant="destructive">
-                        <LogOut className="h-[1.2rem] w-[1.2rem] mr-2" />
-                        Sign Out
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                    <Link href="/">
+                        <LogOut />
+                        <span>Logout</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
