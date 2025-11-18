@@ -55,7 +55,7 @@ const NodeDetailsSheet = ({ open, onOpenChange, nodeData }: { open: boolean, onO
                     <strong>Tasks:</strong>{" "}
                     {service.tasks.map((task: string, index: number) => (
                       <React.Fragment key={task}>
-                        <Link href={`/cluster-map/${task}`} className="text-blue-500 hover:underline">
+                        <Link href={`/cluster-map/task-details?nodeId=${encodeURIComponent(task)}`} className="text-blue-500 hover:underline">
                           {task}
                         </Link>
                         {index < service.tasks.length - 1 && ", "}

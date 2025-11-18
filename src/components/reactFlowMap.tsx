@@ -112,7 +112,7 @@ const ClusterVisualization = ({
       setSelectedNode(node.data);
       setIsSheetOpen(true);
     } else if (node.data && node.data.type === 'Task') {
-      router.push(`/cluster-map/${encodeURIComponent(node.id)}`)
+      router.push(`/cluster-map/task-details?nodeId=${encodeURIComponent(node.id)}`)
     }
   }
 
