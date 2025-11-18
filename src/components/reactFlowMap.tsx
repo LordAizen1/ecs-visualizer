@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from 'next/navigation'
 import ReactFlow, {
   Controls,
   Background,
@@ -17,38 +18,6 @@ import CustomNode from "./CustomNode"
 import NodeDetailsSheet from "./NodeDetailsSheet"
 
 const nodeTypes = { custom: CustomNode };
-
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    position: { x: 0, y: 0 },
-    data: { label: "Task-01" },
-    type: "input",
-  },
-  {
-    id: "2",
-    position: { x: 0, y: 100 },
-    data: { label: "Task-02" },
-  },
-  {
-    id: "3",
-    position: { x: 200, y: 50 },
-    data: { label: "Cluster-Dev" },
-    style: { backgroundColor: "#c1e7ff" },
-  },
-  {
-    id: "4",
-    position: { x: 400, y: 50 },
-    data: { label: "Cluster-Prod" },
-    style: { backgroundColor: "#c1e7ff" },
-  },
-]
-
-const initialEdges: Edge[] = [
-  { id: "e1-3", source: "1", target: "3" },
-  { id: "e1-4", source: "1", target: "4" },
-  { id: "e2-3", source: "2", target: "3" },
-]
 
 import ELK from 'elkjs/lib/elk.bundled.js';
 
@@ -78,75 +47,59 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
     .catch(console.error);
 };
 
-const Legend = () => (
-  <div className="absolute top-4 right-4 p-3 bg-white dark:bg-black border rounded-lg shadow-lg z-10">
-    <h4 className="text-sm font-semibold mb-2">Legend</h4>
-    <div className="flex items-center mb-1">
-      <div
-        className="w-4 h-4 rounded-full mr-2 border"
-        style={{ backgroundColor: "#a855f7" }} // Purple
-      ></div>
-      <span className="text-xs">External Endpoints</span>
-    </div>
-    <div className="flex items-center mb-1">
-      <div
-        className="w-4 h-4 rounded-full mr-2 border"
-        style={{ backgroundColor: "#93c5fd" }} // Blue
-      ></div>
-      <span className="text-xs">Cluster</span>
-    </div>
-    <div className="flex items-center">
-      <div
-        className="w-4 h-4 rounded-full mr-2 border"
-        style={{ backgroundColor: "#86efac" }} // Green
-      ></div>
-      <span className="text-xs">Task</span>
-    </div>
-  </div>
-)
+const legendData = {
+  Cluster: { label: "Cluster", color: "#38bdf8" },
+  Service: { label: "Service", color: "#fbbf24" },
+  Task: { label: "Task", color: "#34d399" },
+  IAMRole: { label: "IAM Role", color: "#fb7185" },
+  Endpoint: { label: "Endpoint", color: "#a78bfa" },
+};
 
-const clusterProdData = {
-  name: "Cluster-Prod",
-  region: "us-east-1",
-  overview: {
-    totalTasks: "8 Running, 1 Pending",
-    services: "2",
-    cpuUtilization: "65%",
-    memoryUtilization: "48%",
-    activeConnections: "24",
-  },
-  services: [
-    {
-      name: "web-service",
-      runningTasks: "2 tasks",
-      launchType: "Fargate",
-      tasks: ["task-01", "task-02"],
-    },
-    {
-      name: "api-gateway-service",
-      runningTasks: "1 task",
-      launchType: "EC2",
-      tasks: ["task-03"],
-    },
-  ],
-  risks: {
-    unusedPermissions: 3,
-    riskyNetworkFlows: 2,
-    compliantTasks: 2,
-  },
+const Legend = ({ nodes }: { nodes: Node[] }) => {
+  const presentNodeTypes = new Set(nodes.map(node => node.data.type));
+
+  return (
+    <div className="absolute top-4 right-4 p-3 bg-white dark:bg-black border rounded-lg shadow-lg z-10">
+      <h4 className="text-sm font-semibold mb-2">Legend</h4>
+      {Object.entries(legendData).map(([type, { label, color }]) => {
+        if (presentNodeTypes.has(type)) {
+          return (
+            <div className="flex items-center mb-1" key={type}>
+              <div
+                className="w-4 h-4 rounded-full mr-2 border"
+                style={{ backgroundColor: color }}
+              ></div>
+              <span className="text-xs">{label}</span>
+            </div>
+          );
+        }
+        return null;
+      })}
+    </div>
+  );
 };
 
 interface ClusterVisualizationProps {
-  showOnlyRisky: boolean
-  showOnlyExternal: boolean
+  showOnlyRisky: boolean;
+  showOnlyExternal: boolean;
+  searchQuery: string;
+  visibleNodeTypes: {
+    services: boolean;
+    tasks: boolean;
+    roles: boolean;
+    endpoints: boolean;
+  };
 }
 
 const ClusterVisualization = ({
   showOnlyRisky,
   showOnlyExternal,
+  searchQuery,
+  visibleNodeTypes,
 }: ClusterVisualizationProps) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const router = useRouter()
+  const [nodes, setNodes, onNodesChange] = useNodesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selectedNode, setSelectedNode] = useState<any>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
 
@@ -155,9 +108,11 @@ const ClusterVisualization = ({
   const [error, setError] = useState<string | null>(null)
 
   const onNodeClick = (event: React.MouseEvent, node: Node) => {
-    if (node.data.label === "Cluster-Prod") {
-      setSelectedNode(clusterProdData);
+    if (node.data && node.data.overview) {
+      setSelectedNode(node.data);
       setIsSheetOpen(true);
+    } else if (node.data && node.data.type === 'Task') {
+      router.push(`/cluster-map/${encodeURIComponent(node.id)}`)
     }
   }
 
@@ -178,23 +133,24 @@ const ClusterVisualization = ({
 
   useEffect(() => {
     if (apiData && apiData.nodes) {
+      // Base transformation
       let transformedNodes = apiData.nodes.map((node: any) => {
         const nodeType = node.label;
         let color = '#ccc';
-        if (nodeType === 'Task') {
-          color = '#86efac';
-        } else if (nodeType === 'Cluster') {
-          color = '#93c5fd';
-        } else if (nodeType === 'External Endpoint') {
-          color = '#a855f7';
-        }
+        if (nodeType === 'Task') color = '#34d399'; // emerald-400
+        else if (nodeType === 'Cluster') color = '#38bdf8'; // sky-400
+        else if (nodeType === 'Service') color = '#fbbf24'; // amber-400
+        else if (nodeType === 'IAMRole') color = '#fb7185'; // rose-400
+        else if (nodeType === 'Endpoint') color = '#a78bfa'; // violet-400
 
         return {
           id: node.id,
           type: 'custom',
           position: { x: 0, y: 0 },
           data: {
+            ...node.properties,
             label: node.properties.name || node.properties.id || node.id,
+            type: nodeType, // Pass the original type for filtering
             isRisky: node.properties.isRisky || false,
             isExternal: node.properties.isExternal || false,
             backgroundColor: color,
@@ -206,11 +162,31 @@ const ClusterVisualization = ({
         id: edge.id,
         source: edge.source,
         target: edge.target,
-        isRisky: edge.properties.isRisky || false,
-        style: edge.properties.isRisky ? { stroke: '#34D399', strokeWidth: 3 } : undefined,
-        animated: edge.properties.isRisky,
+        isRisky: edge.properties?.isRisky || false,
+        style: edge.properties?.isRisky ? { stroke: '#34D399', strokeWidth: 3 } : undefined,
+        animated: edge.properties?.isRisky,
       }));
 
+      // --- FILTERING LOGIC ---
+
+      // 1. Filter by node type visibility
+      const typeVisibilityMap: { [key: string]: boolean } = {
+        Service: visibleNodeTypes.services,
+        Task: visibleNodeTypes.tasks,
+        IAMRole: visibleNodeTypes.roles,
+        Endpoint: visibleNodeTypes.endpoints,
+        Cluster: true, // Always show clusters
+      };
+      transformedNodes = transformedNodes.filter(node => typeVisibilityMap[node.data.type]);
+
+      // 2. Filter by search query
+      if (searchQuery) {
+        transformedNodes = transformedNodes.filter(node =>
+          node.data.label.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      
+      // 3. Filter by risk
       if (showOnlyRisky) {
         transformedEdges = transformedEdges.filter((edge: any) => edge.isRisky);
         const riskyNodeIds = new Set();
@@ -221,28 +197,23 @@ const ClusterVisualization = ({
         transformedNodes = transformedNodes.filter((node: any) => riskyNodeIds.has(node.id));
       }
 
+      // 4. Filter by external
       if (showOnlyExternal) {
         transformedNodes = transformedNodes.filter((node: any) => node.data.isExternal);
-        const externalNodeIds = new Set(transformedNodes.map((node: any) => node.id));
-        transformedEdges = transformedEdges.filter(
-          (edge: any) => externalNodeIds.has(edge.source) && externalNodeIds.has(edge.target)
-        );
       }
+
+      // After all node filtering, filter edges to only include those connecting visible nodes
+      const visibleNodeIds = new Set(transformedNodes.map(n => n.id));
+      transformedEdges = transformedEdges.filter(
+        edge => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
+      );
 
       getLayoutedElements(transformedNodes, transformedEdges).then(({ nodes, edges }) => {
         setNodes(nodes);
         setEdges(edges);
       });
     }
-  }, [apiData, showOnlyRisky, showOnlyExternal, setNodes, setEdges]);
-
-  if (loading) {
-    return <div className="flex h-full items-center justify-center">Loading...</div>
-  }
-
-  if (error) {
-    return <div className="flex h-full items-center justify-center text-red-500">{error}</div>
-  }
+  }, [apiData, showOnlyRisky, showOnlyExternal, searchQuery, visibleNodeTypes, setNodes, setEdges]);
 
   return (
     <div className="h-full w-full">
@@ -258,7 +229,7 @@ const ClusterVisualization = ({
         <Background />
         <Controls />
         <MiniMap />
-        <Legend />
+        <Legend nodes={nodes} />
       </ReactFlow>
       <NodeDetailsSheet
         open={isSheetOpen}

@@ -44,9 +44,7 @@ const Navbar = () => {
                       Dark
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setTheme("purple")}>
-                      Purple
-                    </DropdownMenuItem>
+                    
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setTheme("system")}>
                       System
