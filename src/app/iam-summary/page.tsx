@@ -88,9 +88,9 @@ const TimelinePage = () => {
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        <div className="text-sm">
+        {/* <div className="text-sm">
           Welcome, Kirmada
-        </div>
+        </div> */}
       </div>
 
       {/* Timeline Slider Section */}

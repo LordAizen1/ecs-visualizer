@@ -58,7 +58,6 @@ const NodeDetailsPage = () => {
         {/* Dynamic Header with Breadcrumb */}
         <div className="flex justify-between items-center mb-4">
           <div>
-            <p className="text-sm text-muted-foreground">Welcome User</p> {/* Placeholder for user */}
             <div className="text-lg font-semibold">
               <Link href="/" className="text-blue-600 hover:text-blue-800">Home</Link>
               <span className="mx-2">&gt;</span>

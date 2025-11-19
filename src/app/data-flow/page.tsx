@@ -50,9 +50,9 @@ const DataFlowPage = () => {
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        <div className="ml-auto">
+        {/* <div className="ml-auto">
           <span className="text-sm">Welcome, Kirmada</span>
-        </div>
+        </div> */}
       </header>
 
       {/* Info Cards */}
