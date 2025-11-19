@@ -41,10 +41,19 @@ const CustomNode: React.FC<CustomNodeProps> = ({ data }) => {
         textAlign: 'center',
         backgroundColor: data.backgroundColor, // Use the background color from data
         color: textColor, // Set text color dynamically
+        overflow: 'hidden', // Ensure content is clipped if it overflows
       }}
     >
       <Handle type="target" position={Position.Top} />
-      <div style={{ fontSize: '10px', lineHeight: '1.2' }}>{data.label}</div>
+      <div style={{ 
+        fontSize: '10px', 
+        lineHeight: '1.2',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        width: '100%', // Ensure it takes full width of its parent
+        padding: '0 5px' // Add some padding to prevent text from touching edges
+      }}>{data.label}</div>
       <Handle type="source" position={Position.Bottom} />
     </div>
   );

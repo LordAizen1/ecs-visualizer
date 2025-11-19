@@ -10,14 +10,14 @@ import ReactFlow, {
   useEdgesState,
   Node,
   Edge,
+  StepEdge, // Import StepEdge
 } from "reactflow"
 import "reactflow/dist/style.css"
 
 import { getRoot } from "@/lib/api" // Your API function
 import CustomNode from "./CustomNode"
 import NodeDetailsSheet from "./NodeDetailsSheet"
-
-const nodeTypes = { custom: CustomNode };
+import { Skeleton } from "@/components/ui/skeleton" // Import Skeleton
 
 import ELK from 'elkjs/lib/elk.bundled.js';
 
@@ -26,7 +26,7 @@ const elk = new ELK();
 const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   const graph = {
     id: 'root',
-    layoutOptions: { 'elk.algorithm': 'layered', 'elk.direction': 'RIGHT' },
+    layoutOptions: { 'elk.algorithm': 'layered', 'elk.direction': 'RIGHT' }, // Reverted to RIGHT
     children: nodes.map((node) => ({
       ...node,
       width: 80,
@@ -46,6 +46,9 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
     }))
     .catch(console.error);
 };
+
+const nodeTypes = { custom: CustomNode };
+const edgeTypes = { step: StepEdge }; // Reverted to StepEdge
 
 const legendData = {
   Cluster: { label: "Cluster", color: "#38bdf8" },
@@ -107,6 +110,8 @@ const ClusterVisualization = ({
   const [loading, setLoading] = useState<any>(true)
   const [error, setError] = useState<string | null>(null)
 
+  console.log("ClusterVisualization: loading state:", loading); // Debug log
+
   const onNodeClick = (event: React.MouseEvent, node: Node) => {
     if (node.data && node.data.overview) {
       setSelectedNode(node.data);
@@ -117,14 +122,17 @@ const ClusterVisualization = ({
   }
 
   useEffect(() => {
+    console.log("ClusterVisualization: fetchData useEffect triggered"); // Debug log
     const fetchData = async () => {
       try {
+        setLoading(true); // Ensure loading is true at the start of fetch
         const result = await getRoot();
         setApiData(result);
       } catch (err) {
         setError("Failed to connect to the backend.");
       } finally {
         setLoading(false);
+        console.log("ClusterVisualization: fetchData completed, loading set to false"); // Debug log
       }
     };
 
@@ -132,6 +140,7 @@ const ClusterVisualization = ({
   }, []);
 
   useEffect(() => {
+    console.log("ClusterVisualization: apiData/filters useEffect triggered"); // Debug log
     if (apiData && apiData.nodes) {
       // Base transformation
       let transformedNodes = apiData.nodes.map((node: any) => {
@@ -162,12 +171,16 @@ const ClusterVisualization = ({
         id: edge.id,
         source: edge.source,
         target: edge.target,
+        type: 'step', // Set edge type to StepEdge
         isRisky: edge.properties?.isRisky || false,
         style: edge.properties?.isRisky ? { stroke: '#34D399', strokeWidth: 3 } : undefined,
         animated: edge.properties?.isRisky,
+        markerEnd: {
+          type: 'arrowclosed', // Add arrowhead to the end of the edge
+        },
       }));
 
-      // --- FILTERING LOGIC ---
+      // --- FILTERING LOGELSIC ---
 
       // 1. Filter by node type visibility
       const typeVisibilityMap: { [key: string]: boolean } = {
@@ -217,20 +230,27 @@ const ClusterVisualization = ({
 
   return (
     <div className="h-full w-full">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeClick={onNodeClick}
-        nodeTypes={nodeTypes}
-        fitView
-      >
-        <Background />
-        <Controls />
-        <MiniMap />
-        <Legend nodes={nodes} />
-      </ReactFlow>
+      {loading ? (
+        <div className="flex h-full w-full items-center justify-center">
+          <Skeleton className="h-full w-full" />
+        </div>
+      ) : (
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onNodeClick={onNodeClick}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes} // Pass custom edge types
+          fitView
+        >
+          <Background />
+          <Controls />
+          <MiniMap />
+          <Legend nodes={nodes} />
+        </ReactFlow>
+      )}
       <NodeDetailsSheet
         open={isSheetOpen}
         onOpenChange={setIsSheetOpen}

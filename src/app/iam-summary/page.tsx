@@ -30,6 +30,8 @@ import {
 
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton" // Import Skeleton
+import { ShieldAlert, AlertTriangle, Info } from "lucide-react" // Import icons
 
 const IamSummaryPage = () => {
   const [sliderValue, setSliderValue] = useState(100)
@@ -41,12 +43,13 @@ const IamSummaryPage = () => {
     const fetchIamSummary = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8001/api/v1/iam-summary?days_back=${sliderValue}`
+          `/api/v1/iam-summary?days_back=${sliderValue}`
         )
         if (!response.ok) {
           throw new Error("Failed to fetch IAM summary")
         }
         const data = await response.json()
+        await new Promise(resolve => setTimeout(resolve, 500)); // Artificial delay
         setIamSummaryData(data)
       } catch (err) {
         setError("Failed to load IAM summary.")
@@ -62,7 +65,17 @@ const IamSummaryPage = () => {
 
 
   if (loading) {
-    return <div className="flex h-full items-center justify-center">Loading IAM Summary...</div>
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="flex flex-col space-y-3">
+          <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (error) {
@@ -70,29 +83,19 @@ const IamSummaryPage = () => {
   }
 
   if (!iamSummaryData) {
-    return <div className="flex h-full items-center justify-center">No IAM summary data available.</div>
+    return <div className="flex h-full items-center justify-center">No Timeline & Explanation data available.</div>
   }
 
   const { tableData, insightsData } = iamSummaryData;
 
   return (
     <div className="flex flex-col h-full w-full p-6 space-y-4">
-      
+
       {/* Top Header Section */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">IAM SUMMARY</h2>
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/cluster-map">Cluster</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>IAM Summary</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <h2 className="text-2xl font-bold">TIMELINE & EXPLANATION</h2>
+          <p className="text-sm text-muted-foreground">Cluster - Service Overview</p>
         </div>
       </div>
 
@@ -116,7 +119,7 @@ const IamSummaryPage = () => {
 
       {/* Main Content Area (Table & Insights) */}
       <div className="grid grid-cols-3 gap-6 flex-1">
-        
+
         {/* Left Side: Table */}
         <div className="col-span-2">
           <Card className="h-full">
@@ -136,9 +139,9 @@ const IamSummaryPage = () => {
                     <TableCell>
                       <span className={
                         row.risk === "High" ? "text-red-500" :
-                        row.risk === "Medium" ? "text-yellow-500" :
-                        row.risk === "Low" ? "text-green-500" :
-                        ""
+                          row.risk === "Medium" ? "text-yellow-500" :
+                            row.risk === "Low" ? "text-green-500" :
+                              ""
                       }>
                         {row.risk}
                       </span>
@@ -157,13 +160,31 @@ const IamSummaryPage = () => {
               <CardTitle>INSIGHTS</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-gray-500">DATE - 31/02/2024</p>
               {insightsData.map((insight: any) => (
-                <div key={insight.id}>
-                  <p className="text-sm">* {insight.text}</p>
-                  <Button variant="outline" size="sm" className="mt-1 w-full">
-                    Explain
-                  </Button>
+                <div
+                  key={insight.id}
+                  className={`p-3 rounded-md border ${insight.severity === 'High' ? 'bg-red-500/10 border-red-500/20' :
+                    insight.severity === 'Medium' ? 'bg-yellow-500/10 border-yellow-500/20' :
+                      'bg-blue-500/10 border-blue-500/20'
+                    }`}
+                >
+                  <div className="flex items-start gap-2">
+                    {insight.severity === 'High' ? (
+                      <ShieldAlert className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
+                    ) : insight.severity === 'Medium' ? (
+                      <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 shrink-0" />
+                    ) : (
+                      <Info className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+                    )}
+                    <div>
+                      <p className={`text-sm font-medium ${insight.severity === 'High' ? 'text-red-900 dark:text-red-200' :
+                          insight.severity === 'Medium' ? 'text-yellow-900 dark:text-yellow-200' :
+                            'text-blue-900 dark:text-blue-200'
+                        }`}>
+                        {insight.text}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </CardContent>

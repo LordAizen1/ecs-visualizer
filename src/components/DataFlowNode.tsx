@@ -14,6 +14,16 @@ const DataFlowNode: React.FC<DataFlowNodeProps> = ({ data }) => {
     border: '1px solid #ccc',
     borderRadius: '5px',
     textAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    width: '100%', // Ensure the label takes full width of its container
   };
 
   if (data.type === 'task') {
@@ -34,7 +44,7 @@ const DataFlowNode: React.FC<DataFlowNodeProps> = ({ data }) => {
   return (
     <div style={style}>
       <Handle type="target" position={Position.Left} />
-      <div>{data.label}</div>
+      <div style={labelStyle}>{data.label}</div>
       <Handle type="source" position={Position.Right} />
     </div>
   );

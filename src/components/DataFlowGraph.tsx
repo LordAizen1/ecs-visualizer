@@ -41,41 +41,75 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
     .catch(console.error);
 };
 
-const initialNodes: Node[] = [
-  { id: 'task-01', type: 'custom', data: { label: 'TASK-01', type: 'task' }, position: { x: 0, y: 0 } },
-  { id: 'd0', type: 'custom', data: { label: 'D0', type: 'dependency' }, position: { x: 0, y: 0 } },
-  { id: 'd1', type: 'custom', data: { label: 'D1', type: 'dependency' }, position: { x: 0, y: 0 } },
-  { id: 'd2', type: 'custom', data: { label: 'D2', type: 'dependency' }, position: { x: 0, y: 0 } },
-  { id: 'd3', type: 'custom', data: { label: 'D3', type: 'dependency' }, position: { x: 0, y: 0 } },
-  { id: 'd4', type: 'custom', data: { label: 'D4', type: 'dependency' }, position: { x: 0, y: 0 } },
-  { id: 'res-1', type: 'custom', data: { label: 'RESOURCE 1', type: 'resource' }, position: { x: 0, y: 0 } },
-  { id: 'res-2', type: 'custom', data: { label: 'RESOURCE 2', type: 'resource' }, position: { x: 0, y: 0 } },
-  { id: 'res-3', type: 'custom', data: { label: 'RESOURCE 3', type: 'resource' }, position: { x: 0, y: 0 } },
-];
-
-const initialEdges: Edge[] = [
-  { id: 'e-task-d0', source: 'task-01', target: 'd0', label: 'PERMISSION O' },
-  { id: 'e-task-d1', source: 'task-01', target: 'd1', label: 'PERMISSION Y' },
-  { id: 'e-task-d2', source: 'task-01', target: 'd2', label: 'PERMISSION Z' },
-  { id: 'e-task-d3', source: 'task-01', target: 'd3', label: 'PERMISSION X' },
-  { id: 'e-task-d4', source: 'task-01', target: 'd4', label: 'PERMISSION V' },
-  { id: 'e-d0-res1', source: 'd0', target: 'res-1', label: 'PERMISSION M' },
-  { id: 'e-d1-res1', source: 'd1', target: 'res-1', label: 'PERMISSION N' },
-  { id: 'e-d2-res2', source: 'd2', target: 'res-2', label: 'PERMISSION Y' },
-  { id: 'e-d3-res3', source: 'd3', target: 'res-3', label: 'PERMISSION P' },
-  { id: 'e-d4-res3', source: 'd4', target: 'res-3', label: 'PERMISSION K' },
-];
-
-const DataFlowGraph = () => {
+const DataFlowGraph = ({ initialNodes, initialEdges }: { initialNodes: Node[], initialEdges: Edge[] }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [hoveredEdge, setHoveredEdge] = useState<string | null>(null);
+  const [tooltipData, setTooltipData] = useState<{ x: number; y: number; action: string } | null>(null);
+  const [isTooltipHovered, setIsTooltipHovered] = useState(false);
 
   useEffect(() => {
     getLayoutedElements(initialNodes, initialEdges).then(({ nodes, edges }) => {
       setNodes(nodes);
-      setEdges(edges);
+      // Modify edges to add colors and prepare for hover
+      const modifiedEdges = (edges || []).map((edge: any) => {
+        const risk = edge.data?.risk || edge.risk || 'low';
+        const edgeColor = risk === 'high' ? '#ef4444' : risk === 'medium' ? '#eab308' : '#3b82f6';
+
+        return {
+          ...edge,
+          type: 'smoothstep',
+          style: {
+            stroke: edgeColor,
+            strokeWidth: hoveredEdge === edge.id ? 3 : 2
+          },
+          // Only show label on hover
+          label: hoveredEdge === edge.id ? edge.label : undefined,
+          labelStyle: { fontSize: 11, fontWeight: 600, fill: '#fff' },
+          labelBgStyle: { fill: '#000', fillOpacity: 0.9 },
+          labelBgPadding: [6, 8],
+          animated: hoveredEdge === edge.id,
+        };
+      });
+      setEdges(modifiedEdges);
     });
-  }, []);
+  }, [initialNodes, initialEdges, hoveredEdge]); // Re-run when hover state changes
+
+  const onEdgeMouseEnter = (event: any, edge: Edge) => {
+    setHoveredEdge(edge.id);
+
+    // Find all edges between the same source and target
+    const relatedEdges = edges.filter(
+      (e: any) => e.source === edge.source && e.target === edge.target
+    );
+
+    // Collect all actions/permissions from these edges
+    const allActions = relatedEdges.map((e: any) =>
+      e.data?.fullAction || e.label || 'Unknown permission'
+    );
+
+    setTooltipData({
+      x: event.clientX,
+      y: event.clientY,
+      action: allActions.join('\n') // Join with newlines for multiline display
+    });
+  };
+
+  const onEdgeMouseLeave = () => {
+    // Only hide if not hovering over tooltip
+    setTimeout(() => {
+      if (!isTooltipHovered) {
+        setHoveredEdge(null);
+        setTooltipData(null);
+      }
+    }, 100);
+  };
+
+  const onEdgeMouseMove = (event: any) => {
+    if (tooltipData) {
+      setTooltipData(prev => prev ? { ...prev, x: event.clientX, y: event.clientY } : null);
+    }
+  };
 
   return (
     <ReactFlow
@@ -83,12 +117,42 @@ const DataFlowGraph = () => {
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
+      onEdgeMouseEnter={onEdgeMouseEnter}
+      onEdgeMouseLeave={onEdgeMouseLeave}
+      onEdgeMouseMove={onEdgeMouseMove}
       nodeTypes={nodeTypes}
       fitView
       className="h-full"
     >
       <Background />
       <Controls />
+      {/* Tooltip for edge permissions */}
+      {tooltipData && (
+        <div
+          style={{
+            position: 'fixed',
+            left: tooltipData.x + 10,
+            top: tooltipData.y + 10,
+            zIndex: 1000,
+          }}
+          className="bg-black/90 text-white text-xs px-3 py-2 rounded shadow-lg max-w-sm max-h-64 overflow-y-auto"
+          onMouseEnter={() => setIsTooltipHovered(true)}
+          onMouseLeave={() => {
+            setIsTooltipHovered(false);
+            setTooltipData(null);
+            setHoveredEdge(null);
+          }}
+        >
+          <div className="font-semibold mb-2">Permissions ({tooltipData.action.split('\n').length}):</div>
+          <div className="space-y-1">
+            {tooltipData.action.split('\n').map((action, i) => (
+              <div key={i} className="pl-2 border-l-2 border-white/30 py-0.5">
+                {action}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </ReactFlow>
   );
 };

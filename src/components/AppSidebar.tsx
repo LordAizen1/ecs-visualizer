@@ -15,8 +15,8 @@ const items = [
         icon: Network,
     },
     {
-        title: "IAM Summary",
-        url: "/iam-summary",
+        title: "Timeline & Explanation",
+        url: "/iam-summary", // URL remains the same
         icon: ShieldCheck,
     },
     {
