@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Increase timeout for slow AWS API calls
+  experimental: {
+    proxyTimeout: 60000, // 60 seconds
+  },
+  // Prevent connection issues
+  httpAgentOptions: {
+    keepAlive: true,
+  },
 };
 
 export default nextConfig;
