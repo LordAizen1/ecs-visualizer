@@ -53,11 +53,11 @@ const NodeDetailsSheet = ({ open, onOpenChange, nodeData }: { open: boolean, onO
                   <p><strong>Launch Type:</strong> {service.launchType}</p>
                   <div>
                     <strong>Tasks:</strong>{" "}
-                    {service.tasks.map((task: string, index: number) => {
-                      const taskId = task.split('/').pop(); // Extract task ID from ARN
+                    {service.tasks.map((taskArn: string, index: number) => {
+                      const taskId = taskArn.split('/').pop(); // Extract task ID from ARN for display
                       return (
-                        <React.Fragment key={task}>
-                          <Link href={`/cluster-map/task-details?nodeId=${encodeURIComponent(task)}`} className="text-blue-500 hover:underline">
+                        <React.Fragment key={taskArn}>
+                          <Link href={`/cluster-map/task-details?nodeId=${encodeURIComponent(taskArn)}`} className="text-blue-500 hover:underline">
                             {taskId}
                           </Link>
                           {index < service.tasks.length - 1 && ", "}

@@ -66,7 +66,7 @@ const IamSummaryPage = () => {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
+      <div className="flex h-screen items-center justify-center">
         <div className="flex flex-col space-y-3">
           <Skeleton className="h-[125px] w-[250px] rounded-xl" />
           <div className="space-y-2">
@@ -122,7 +122,7 @@ const IamSummaryPage = () => {
 
         {/* Left Side: Table */}
         <div className="col-span-2">
-          <Card className="h-full">
+          <Card className="h-full px-2">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -178,8 +178,8 @@ const IamSummaryPage = () => {
                     )}
                     <div>
                       <p className={`text-sm font-medium ${insight.severity === 'High' ? 'text-red-900 dark:text-red-200' :
-                          insight.severity === 'Medium' ? 'text-yellow-900 dark:text-yellow-200' :
-                            'text-blue-900 dark:text-blue-200'
+                        insight.severity === 'Medium' ? 'text-yellow-900 dark:text-yellow-200' :
+                          'text-blue-900 dark:text-blue-200'
                         }`}>
                         {insight.text}
                       </p>

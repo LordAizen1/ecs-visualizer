@@ -7,7 +7,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertTriangle, CheckCircle, X } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
-import Link from "next/link" // Import Link for navigation
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 const NodeDetailsPage = () => {
   const searchParams = useSearchParams()
@@ -96,18 +103,19 @@ const NodeDetailsPage = () => {
 
   return (
     <div className="container mx-auto p-4">
-      {/* Dynamic Header with Breadcrumb */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <div className="text-lg font-semibold">
-            <Link href="/" className="text-blue-600 hover:text-blue-800">Home</Link>
-            <span className="mx-2">&gt;</span>
-            <Link href="/cluster-map" className="text-blue-600 hover:text-blue-800">Cluster Map</Link>
-            <span className="mx-2">&gt;</span>
-            <span>{task_configuration.task_name}</span>
-          </div>
-        </div>
-        {/* The X icon is removed as per instruction */}
+      {/* Header with Breadcrumb */}
+      <div className="mb-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/cluster-map">Cluster Map</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{task_configuration.task_name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
