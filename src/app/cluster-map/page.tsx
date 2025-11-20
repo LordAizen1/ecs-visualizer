@@ -27,7 +27,7 @@ const ClusterMapPage = () => {
   const [showOnlyRisky, setShowOnlyRisky] = useState(false);
   const [showOnlyExternal, setShowOnlyExternal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // New: Node type visibility
   const [visibleNodeTypes, setVisibleNodeTypes] = useState({
     services: true,
@@ -52,15 +52,6 @@ const ClusterMapPage = () => {
     <div className="flex h-screen">
       {/* Filter Sidebar */}
       <div className="w-80 border-r bg-background p-6 space-y-6 overflow-y-auto">
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight">Cluster Map</h2>
-          <p className="text-sm text-muted-foreground">
-            Visualize your ECS infrastructure
-          </p>
-        </div>
-
-        <Separator />
-
         {/* Search */}
         <div className="space-y-2">
           <Label htmlFor="search" className="text-sm font-medium">
@@ -86,7 +77,7 @@ const ClusterMapPage = () => {
             <Eye className="h-4 w-4" />
             Show/Hide Nodes
           </Label>
-          
+
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm">Services</span>
@@ -97,7 +88,7 @@ const ClusterMapPage = () => {
                 }
               />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm">Tasks</span>
               <Switch
@@ -107,7 +98,7 @@ const ClusterMapPage = () => {
                 }
               />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm">IAM Roles</span>
               <Switch
@@ -117,7 +108,7 @@ const ClusterMapPage = () => {
                 }
               />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm">External Endpoints</span>
               <Switch
@@ -138,7 +129,7 @@ const ClusterMapPage = () => {
             <SlidersHorizontal className="h-4 w-4" />
             Filters
           </Label>
-          
+
           <div className="flex items-center justify-between">
             <span className="text-sm">Show only risky flows</span>
             <Switch
@@ -146,7 +137,7 @@ const ClusterMapPage = () => {
               onCheckedChange={setShowOnlyRisky}
             />
           </div>
-          
+
           <div className="flex items-center justify-between">
             <span className="text-sm">Show only external endpoints</span>
             <Switch

@@ -10,14 +10,47 @@ import Link from "next/link"
 const HomePage = () => {
   const [accessKey, setAccessKey] = useState("")
   const [secretKey, setSecretKey] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const router = useRouter()
 
-  const handleConnect = () => {
-    // Basic check if keys are entered. No real validation for development.
-    if (accessKey && secretKey) {
-      router.push("/home")
-    } else {
-      alert("Please enter both Access Key and Secret Key.")
+  const handleConnect = async () => {
+    // Clear previous error
+    setError("")
+
+    // Basic check if keys are entered
+    if (!accessKey || !secretKey) {
+      setError("Please enter both Access Key and Secret Key.")
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      // Call backend validation endpoint
+      const response = await fetch("/api/v1/auth/validate-credentials", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_key_id: accessKey,
+          secret_access_key: secretKey,
+        }),
+      })
+
+      if (response.ok) {
+        // Credentials are valid, proceed to home
+        router.push("/home")
+      } else {
+        // Invalid credentials
+        const data = await response.json()
+        setError(data.detail || "Invalid AWS credentials. Please check and try again.")
+      }
+    } catch (err) {
+      setError("Failed to validate credentials. Please check your connection.")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -36,6 +69,11 @@ const HomePage = () => {
             <CardDescription>Connect your AWS account to get started.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {error && (
+              <div className="p-3 rounded bg-red-500/10 border border-red-500 text-red-500 text-sm">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <label htmlFor="access-key" className="w-40">AWS Access Key ID</label>
@@ -44,6 +82,7 @@ const HomePage = () => {
                   type="password"
                   value={accessKey}
                   onChange={(e) => setAccessKey(e.target.value)}
+                  disabled={loading}
                 />
               </div>
               <div className="flex items-center space-x-2">
@@ -53,6 +92,7 @@ const HomePage = () => {
                   type="password"
                   value={secretKey}
                   onChange={(e) => setSecretKey(e.target.value)}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -62,11 +102,12 @@ const HomePage = () => {
           </CardContent>
           <CardFooter className="flex flex-col items-start space-y-4">
             <div className="flex space-x-2">
-              <Button onClick={handleConnect}>Connect</Button>
-              <Button variant="outline">Use Demo Dataset</Button>
+              <Button onClick={handleConnect} disabled={loading}>
+                {loading ? "Validating..." : "Connect"}
+              </Button>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              "Your credentials are not stored. All analysis is local."
+              "Your credentials are validated with AWS and not stored."
             </p>
           </CardFooter>
         </Card>

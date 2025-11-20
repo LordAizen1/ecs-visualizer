@@ -91,14 +91,6 @@ const IamSummaryPage = () => {
   return (
     <div className="flex flex-col h-full w-full p-6 space-y-4">
 
-      {/* Top Header Section */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">TIMELINE & EXPLANATION</h2>
-          <p className="text-sm text-muted-foreground">Cluster - Service Overview</p>
-        </div>
-      </div>
-
       {/* Timeline Slider Section */}
       <Card>
         <CardContent className="">

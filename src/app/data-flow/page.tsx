@@ -1,14 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
@@ -17,9 +9,9 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from "@/components/ui/collapsible"
-import { FunnelIcon, XIcon, ChevronDown } from "lucide-react"
+import { ChevronDown, Filter } from "lucide-react"
 import DataFlowGraph from "@/components/DataFlowGraph"
-import { Skeleton } from "@/components/ui/skeleton" // Import Skeleton
+import { Skeleton } from "@/components/ui/skeleton"
 
 const DataFlowPage = () => {
   const [selectedTasks, setSelectedTasks] = useState<string[]>([])
@@ -83,24 +75,6 @@ const DataFlowPage = () => {
 
   return (
     <div className="flex flex-col h-screen w-full">
-      {/* Top Header Section */}
-      <header className="flex items-center h-16 px-6 border-b">
-        <div>
-          <h2 className="text-2xl font-bold">DATA FLOW</h2>
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/cluster-map">Cluster</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Service Overview</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
-
       {/* Info Cards */}
       <div className="grid grid-cols-3 gap-4 p-6">
         <Card>
@@ -158,7 +132,7 @@ const DataFlowPage = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div className="flex items-center gap-2">
-                <FunnelIcon className="h-5 w-5" />
+                <Filter className="h-5 w-5" />
                 <CardTitle>Filter</CardTitle>
               </div>
             </CardHeader>
